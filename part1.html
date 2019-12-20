@@ -1,0 +1,108 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta charset="UTF-8" />
+    <title>Making your first Phaser 3 Game - Part 1</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+    var config = {
+        type: Phaser.AUTO,
+        width: 610,
+        height: 610,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 300 },
+                debug: false
+            }
+        },
+        scene: {
+            preload: preload,
+            create: create,
+            update: update
+        }
+    };
+
+    var player;
+    var boules;
+    var gameOver = false;
+
+    var game = new Phaser.Game(config);
+
+    function preload ()
+    {
+    this.load.image('etoile', 'assets/etoile.jpg');
+    this.load.image('boule', 'assets/boule.png');
+    this.load.spritesheet('chat', 
+        'assets/chat.png',
+        { frameWidth: 100, frameHeight: 100 }
+    );
+    }
+
+    function create ()
+    {
+        this.add.image(305, 305, 'etoile');
+
+        player = this.physics.add.sprite(100, 450, 'chat');
+
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+
+        cursors = this.input.keyboard.createCursorKeys();
+
+        boules = this.physics.add.group({
+            key: 'boule',
+            repeat: 4,
+            setXY: { x: 70, y: 0, stepX: 120 }
+        });
+    }
+
+    function update ()
+    {
+        if (gameOver)
+        {
+            return;
+        }
+
+        if (cursors.left.isDown)
+        {
+            player.setVelocityX(-250);
+        }
+else if (cursors.right.isDown)
+{
+    player.setVelocityX(250);
+}
+else
+{
+    player.setVelocityX(0);
+
+}
+
+if (cursors.up.isDown && player.body.touching.down)
+{
+    player.setVelocityY(-330);
+}
+}
+
+function hitboule (player, boule)
+{
+    this.physics.pause();
+
+    player.setTint(0xff0000);
+
+    gameOver = true;
+}
+
+</script>
+
+</body>
+</html>
