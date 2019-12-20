@@ -31,21 +31,29 @@
             update: update
         }
     };
-
+    var reduceinterval;
     var player;
     var boules;
+    var interval;
     var gameOver = false;
+
 
     var game = new Phaser.Game(config);
 
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
     function preload ()
     {
-    this.load.image('etoile', 'assets/etoile.jpg');
-    this.load.image('boule', 'assets/boule.png');
-    this.load.spritesheet('chat', 
-        'assets/chat.png',
-        { frameWidth: 100, frameHeight: 100 }
-    );
+        this.load.image('etoile', 'assets/etoile.jpg');
+        this.load.image('boule', 'assets/boule.png');
+        this.load.spritesheet('chat', 
+            'assets/chat.png',
+            { frameWidth: 100, frameHeight: 100 }
+        );
     }
 
     function create ()
@@ -58,49 +66,53 @@
         player.setCollideWorldBounds(true);
 
         cursors = this.input.keyboard.createCursorKeys();
+        
+        interval = setInterval(function() {
+            ajouterUneBoule(this, player)
+        }.bind(this), 1000
+        );
 
-        boules = this.physics.add.group({
+        this.physics.add.collider(player, boules, hitboule, null, this);
+    }
+
+    function ajouterUneBoule(scene, player)
+    {
+        if (gameOver) {
+            clearInterval(interval);
+        }
+        boules = scene.physics.add.group({
             key: 'boule',
-            repeat: 4,
-            setXY: { x: 70, y: 0, stepX: 120 }
+            setXY: { x: getRandomInt(50, 560), y: 0 }
         });
+        scene.physics.add.collider(player, boules, hitboule, null, scene);
     }
 
     function update ()
     {
-        if (gameOver)
-        {
+        if (gameOver) {
             return;
         }
-
         if (cursors.left.isDown)
         {
-            player.setVelocityX(-250);
+            player.setVelocityX(-350);
         }
-else if (cursors.right.isDown)
-{
-    player.setVelocityX(250);
-}
-else
-{
-    player.setVelocityX(0);
+        else if (cursors.right.isDown)
+        {
+            player.setVelocityX(350);
+        }
+        else
+        {
+            player.setVelocityX(0);
+        }
+    }
 
-}
-
-if (cursors.up.isDown && player.body.touching.down)
-{
-    player.setVelocityY(-330);
-}
-}
-
-function hitboule (player, boule)
-{
-    this.physics.pause();
-
-    player.setTint(0xff0000);
-
-    gameOver = true;
-}
+    function hitboule (player, boules)
+    {
+        this.physics.pause();
+        gameOver = true;
+        alert('YOU LOOSE');
+        window.location.reload();
+    }
 
 </script>
 
